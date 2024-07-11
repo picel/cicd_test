@@ -1,0 +1,61 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend:
+    name: Build and Deploy Backend
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        echo "${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}" > ~/.ssh/id_rsa_passphrase
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Build Docker Images
+      run: |
+        cd backend
+        for dir in */ ; do
+          cd $dir
+          docker build -t myapp-${dir%/} .
+          cd ..
+        done
+
+    - name: Deploy Docker Containers
+      run: |
+        cd backend
+        for dir in */ ; do
+          sshpass -P passphrase -f ~/.ssh/id_rsa_passphrase ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "docker stop myapp-${dir%/} || true && docker rm myapp-${dir%/} || true && docker run -d --name myapp-${dir%/} myapp-${dir%/}"
+        done
+
+  frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm install
+        npm run build
+
+    - name: Upload to Bunny CDN
+      run: |
+        cd frontend/build
+        lftp -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} -e "set ftp:passive-mode on; set ftp:port ${{ secrets.FTP_PORT }}; mirror -R . /${{ secrets.FTP_HOST_NAME }}; quit" ftp://storage.bunnycdn.com
