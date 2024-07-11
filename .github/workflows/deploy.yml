@@ -19,9 +19,9 @@ jobs:
 
     - name: Set up SSH
       run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/private-key.pem
-        chmod 600 ~/private-key.pem
         mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -t rsa ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
     - name: Build Docker Images
@@ -37,7 +37,7 @@ jobs:
       run: |
         cd backend
         for dir in */ ; do
-          ssh -i ~/private-key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "docker stop myapp-${dir%/} || true && docker rm myapp-${dir%/} || true && docker run -d --name myapp-${dir%/} myapp-${dir%/}"
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "docker stop myapp-${dir%/} || true && docker rm myapp-${dir%/} || true && docker run -d --name myapp-${dir%/} myapp-${dir%/}"
         done
 
   frontend:
@@ -62,4 +62,4 @@ jobs:
     - name: Upload to Bunny CDN
       run: |
         cd frontend/dist
-        lftp -c "set ftp:ssl-allow no; set ftp:passive-mode yes; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_HOST_NAME }}; mirror -R . /"
+        lftp -c "set ftp:ssl-allow no; set ftp:passive-mode yes; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_HOST_NAME }}; mirror -R . ./"
