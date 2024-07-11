@@ -62,4 +62,4 @@ jobs:
     - name: Upload to Bunny CDN
       run: |
         cd frontend/dist
-        lftp -u '${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}' -e "set ftp:passive-mode on; mirror -R . /${{ secrets.FTP_HOST_NAME }}; quit" ftp://storage.bunnycdn.com
+        lftp -u '${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}' -e "set ftp:passive-mode on; mirror -R . /${{ secrets.FTP_HOST_NAME }}; quit" ${{ secrets.FTP_HOST_NAME }}
