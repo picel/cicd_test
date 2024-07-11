@@ -19,11 +19,10 @@ jobs:
 
     - name: Set up SSH
       run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/private-key.pem
+        chmod 600 ~/private-key.pem
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-        cat ~/.ssh/id_rsa 
+        ssh-keyscan -t rsa ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
     - name: Build Docker Images
       run: |
@@ -38,7 +37,7 @@ jobs:
       run: |
         cd backend
         for dir in */ ; do
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "docker stop myapp-${dir%/} || true && docker rm myapp-${dir%/} || true && docker run -d --name myapp-${dir%/} myapp-${dir%/}"
+          ssh -i ~/private-key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "docker stop myapp-${dir%/} || true && docker rm myapp-${dir%/} || true && docker run -d --name myapp-${dir%/} myapp-${dir%/}"
         done
 
   frontend:
