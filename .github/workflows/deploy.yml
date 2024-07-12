@@ -23,15 +23,6 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -t rsa ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-        echo "Host server
-              HostName ${{ secrets.SERVER_HOST }}
-              User ${{ secrets.SERVER_USER }}
-              IdentityFile ~/.ssh/id_rsa
-              StrictHostKeyChecking no" > ~/.ssh/config
-        cat ~/.ssh/config
-
-    # - name: Test SSH connection
-    #   run: ssh server 'echo "SSH connection successful"'
 
     - name: Build Docker Images
       run: |
@@ -46,7 +37,7 @@ jobs:
       run: |
         cd backend
         for dir in */ ; do
-          ssh server "docker stop myapp-${dir%/} || true && docker rm myapp-${dir%/} || true && docker run -d --name myapp-${dir%/} myapp-${dir%/}"
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "docker stop myapp-${dir%/} || true && docker rm myapp-${dir%/} || true && docker run -d --name myapp-${dir%/} myapp-${dir%/}"
         done
 
   # frontend:
