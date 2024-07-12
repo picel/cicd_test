@@ -41,14 +41,14 @@ jobs:
     - name: Deploy Docker Containers and Update Nginx
       run: |
         cd backend
-        port=7000
+        port=8000
         for dir in */ ; do
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest &&
             docker stop ssafy-common-${dir%/} || true &&
             docker rm ssafy-common-${dir%/} || true &&
-            docker run -d --name ssafy-common-${dir%/} -p \$port:80 ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest
-            echo ssafy-common-${dir%/}:\$port >> ~/nginx_ports.txt
+            docker run -d --name ssafy-common-${dir%/} -p $port:80 ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest
+            echo ssafy-common-${dir%/}:$port >> ~/nginx_ports.txt
             port=\$((port+1))
           "
         done
