@@ -29,6 +29,7 @@ jobs:
           docker tag ssafy-common-${dir%/} ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest
           cd ..
+        done
         
     - name: Set up SSH
       run: |
