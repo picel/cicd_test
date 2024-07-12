@@ -41,7 +41,7 @@ jobs:
     - name: Deploy Docker Containers and Update Nginx
       run: |
         cd backend
-        port=8000  # Initial port, you can choose the starting point
+        port=7000
         for dir in */ ; do
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest &&
