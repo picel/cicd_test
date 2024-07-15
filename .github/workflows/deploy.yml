@@ -44,12 +44,12 @@ jobs:
         port=8000
         ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
           while read -r line; do
-            docker stop \$line || true
-            docker rm \$line || true
+            container=\$(echo \$line | cut -d ':' -f 1)
+            docker stop \$container || true
+            docker rm \$container || true
           done < ~/nginx_ports.txt
           rm ~/nginx_ports.txt
         "
-        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "rm ~/nginx_ports.txt || true"
         for dir in */ ; do
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest &&
