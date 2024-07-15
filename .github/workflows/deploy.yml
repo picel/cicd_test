@@ -55,8 +55,8 @@ jobs:
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest &&
             docker run -d --restart=always --name ssafy-common-${dir%/} -p $port:80 ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest
             echo ssafy-common-${dir%/}:$port >> ~/nginx_ports.txt
-            port=\$((port+1))
           "
+          port=$((port+1))
         done
 
   frontend:
