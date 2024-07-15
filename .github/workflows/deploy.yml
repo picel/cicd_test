@@ -42,12 +42,14 @@ jobs:
       run: |
         cd backend
         port=8000
+        rm -f ~/nginx_ports.txt
+        touch ~/nginx_ports.txt
         for dir in */ ; do
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest &&
             docker stop ssafy-common-${dir%/} || true &&
             docker rm ssafy-common-${dir%/} || true &&
-            docker run -d --name ssafy-common-${dir%/} -p $port:80 ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest
+            docker run -d --restart=always --name ssafy-common-${dir%/} -p $port:80 ${{ secrets.DOCKER_HUB_USERNAME }}/ssafy-common-${dir%/}:latest
             echo ssafy-common-${dir%/}:$port >> ~/nginx_ports.txt
             port=\$((port+1))
           "
