@@ -44,9 +44,9 @@ jobs:
         port=8000
         ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
           while read -r line; do
-            container=$(echo \$line | cut -d ':' -f 1)
-            docker stop $container || true
-            docker rm $container || true
+            container=\$(echo \$line | cut -d ':' -f 1)
+            docker stop \$container || true
+            docker rm \$container || true
           done < ~/nginx_ports.txt
           rm ~/nginx_ports.txt
         "
