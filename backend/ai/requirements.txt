@@ -1,2 +1,5 @@
 fastapi
 uvicorn
+databases
+asyncmy
+pydantic
