@@ -5,7 +5,7 @@ import os
 app = FastAPI()
 
 DATABASE_URL = os.getenv(
-    'DATABASE_URL', 'mysql://root:password@mysql:3306/mydb')
+    'DATABASE_URL', 'mysql://root:password@mysql:3306/kubetest')
 
 database = Database(DATABASE_URL)
 
