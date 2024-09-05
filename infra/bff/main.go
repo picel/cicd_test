@@ -27,6 +27,14 @@ var (
 	}
 )
 
+func publishKafkaEventAsync(topic, message, correlationID string) {
+	go func() {
+		if err := publishKafkaEvent(topic, message, correlationID); err != nil {
+			log.Printf("Failed to send Kafka event asynchronously: %v", err)
+		}
+	}()
+}
+
 func main() {
 	// 서버 핸들러 등록
 	http.HandleFunc("/api/v1/bff/test1", handleTest1)
@@ -51,11 +59,7 @@ func handleTest1(w http.ResponseWriter, r *http.Request) {
 	correlationID := uuid.New().String() // Correlation ID 생성
 
 	// Kafka Event 발행
-	if err := publishKafkaEvent("service-a", "Test1 Kafka Event", correlationID); err != nil {
-		log.Printf("Failed to send Kafka event: %v", err)
-		http.Error(w, "Failed to send Kafka event", http.StatusInternalServerError)
-		return
-	}
+	publishKafkaEventAsync("service-a", "Test1 Kafka Event", correlationID)
 
 	// HTTP 요청 보내기 (context with timeout)
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
@@ -91,11 +95,7 @@ func handleTest2(w http.ResponseWriter, r *http.Request) {
 	correlationID := uuid.New().String() // Correlation ID 생성
 
 	// Kafka Event 발행
-	if err := publishKafkaEvent("service-b", "Test2 Kafka Event", correlationID); err != nil {
-		log.Printf("Failed to send Kafka event: %v", err)
-		http.Error(w, "Failed to send Kafka event", http.StatusInternalServerError)
-		return
-	}
+	publishKafkaEventAsync("service-b", "Test2 Kafka Event", correlationID)
 
 	// HTTP 요청 보내기 (context with timeout)
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
