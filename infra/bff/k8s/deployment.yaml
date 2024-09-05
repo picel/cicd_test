@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bff-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff
+  namespace: bff-server
+  labels:
+    app: bff
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bff
+  template:
+    metadata:
+      labels:
+        app: bff
+    spec:
+      containers:
+      - name: bff-server
+        image: tkdqja9573/bff-server:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: KAFKA_BROKER
+          value: "kafka.event-queue.svc.cluster.local:9092" # Kafka 서비스의 내부 DNS
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bff
+  namespace: bff-server
+  labels:
+    app: bff
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: bff
+  type: ClusterIP

@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssr-frontend
+  namespace: frontend
+  labels:
+    app: ssr-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssr-frontend
+  template:
+    metadata:
+      labels:
+        app: ssr-frontend
+    spec:
+      containers:
+      - name: ssr-frontend
+        image: tkdqja9573/frontend:latest # 빌드된 Docker 이미지를 설정하세요.
+        ports:
+        - containerPort: 8081
+        env:
+        - name: BFF_URL
+          value: "http://bff-service.svc.cluster.local:8080" # BFF 서비스의 내부 DNS 주소
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssr-frontend
+  namespace: frontend
+  labels:
+    app: ssr-frontend
+spec:
+  ports:
+  - port: 80                # 외부 접근을 위해 사용할 포트
+    targetPort: 8081        # 컨테이너의 포트
+  selector:
+    app: ssr-frontend
+  type: NodePort            # NodePort 설정으로 외부 접근 가능하게 함
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ssr-frontend
+  namespace: frontend
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  rules:
+  - host: ssafy.picel.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ssr-frontend
+            port:
+              number: 80
