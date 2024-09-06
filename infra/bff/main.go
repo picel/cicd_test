@@ -13,8 +13,7 @@ import (
 )
 
 var (
-	kafkaBroker = "kafka.event-queue.svc.cluster.local:9092" // Kubernetes 내 Kafka 서비스 도메인
-	// Kafka writer 재사용을 위한 초기화
+	kafkaBroker  = "kafka.event-queue.svc.cluster.local:9092"
 	kafkaWriters = map[string]*kafka.Writer{
 		"service-a": kafka.NewWriter(kafka.WriterConfig{
 			Brokers: []string{kafkaBroker},
@@ -65,7 +64,7 @@ func handleTest1(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://service-b.namespace-b.svc.cluster.local:8081/api/v1/service-b/test1", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://service-b.b-server.svc.cluster.local:8081/api/v1/service-b/test1", nil)
 	if err != nil {
 		log.Printf("Failed to create HTTP request: %v", err)
 		http.Error(w, "Failed to create HTTP request", http.StatusInternalServerError)
@@ -101,7 +100,7 @@ func handleTest2(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://service-a.namespace-a.svc.cluster.local:8081/api/v1/service-a/test1", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://service-a.a-server.svc.cluster.local:8081/api/v1/service-a/test1", nil)
 	if err != nil {
 		log.Printf("Failed to create HTTP request: %v", err)
 		http.Error(w, "Failed to create HTTP request", http.StatusInternalServerError)

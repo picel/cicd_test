@@ -23,11 +23,12 @@ spec:
       containers:
       - name: bff-server
         image: tkdqja9573/bff-server:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
         - name: KAFKA_BROKER
-          value: "kafka.event-queue.svc.cluster.local:9092" # Kafka 서비스의 내부 DNS
+          value: "kafka.event-queue.svc.cluster.local:9092"
         resources:
           requests:
             memory: "64Mi"

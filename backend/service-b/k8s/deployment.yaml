@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: namespace-b
+  name: b-server
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: service-b
-  namespace: namespace-b
+  namespace: b-server
   labels:
     app: service-b
 spec:
@@ -23,17 +23,15 @@ spec:
       containers:
       - name: service-b
         image: tkdqja9573/service-b:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8081
-        env:
-        - name: KAFKA_BROKER
-          value: "kafka.event-queue.svc.cluster.local:9092"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: service-b
-  namespace: namespace-b
+  namespace: b-server
   labels:
     app: service-b
 spec:

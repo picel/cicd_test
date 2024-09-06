@@ -6,8 +6,7 @@ import os
 app = Flask(__name__)
 
 # Kafka configuration
-KAFKA_BROKER = os.getenv(
-    "KAFKA_BROKER", "kafka.event-queue.svc.cluster.local:9092")
+KAFKA_BROKER = "kafka.event-queue.svc.cluster.local:9092"
 SERVICE_NAME = "service-b"
 
 consumer = Consumer({
