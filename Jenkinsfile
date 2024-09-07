@@ -42,6 +42,7 @@ pipeline {
                                 sh "docker push ${imageName}"
 
                                 sh "kubectl apply -f k8s/deployment.yaml"
+                                sh "kubectl apply -f k8s/hpa.yaml"
                             }
                         }
                     }
@@ -56,6 +57,7 @@ pipeline {
                                 sh "docker push ${imageName}"
 
                                 sh "kubectl apply -f k8s/deployment.yaml"
+                                sh "kubectl apply -f k8s/hpa.yaml"
                             }
                         }
                     }
@@ -78,6 +80,7 @@ pipeline {
                                         sh "docker push ${imageName}"
 
                                         sh "kubectl apply -f k8s/deployment.yaml"
+                                        sh "kubectl apply -f k8s/hpa.yaml"
                                     }
                                 }
                             }

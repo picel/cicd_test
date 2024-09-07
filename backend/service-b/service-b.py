@@ -42,6 +42,9 @@ def http_check():
     print(f"Received HTTP request with Correlation ID: {correlation_id}")
     return f"Service {SERVICE_NAME} HTTP Check! Correlation ID: {correlation_id}"
 
+@app.route('/healthz', methods=['GET'])
+def health_check():
+    return "Service B is healthy"
 
 if __name__ == '__main__':
     threading.Thread(target=consume_kafka_messages).start()

@@ -38,6 +38,9 @@ func main() {
 	// 서버 핸들러 등록
 	http.HandleFunc("/api/v1/bff/test1", handleTest1)
 	http.HandleFunc("/api/v1/bff/test2", handleTest2)
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 
 	// 프로그램 종료 시 Kafka Writer 닫기
 	defer closeKafkaWriters()
