@@ -40,7 +40,7 @@ pipeline {
                                 def imageName = 'tkdqja9573/bff-server:latest'
                                 sh "docker build -t ${imageName} ."
                                 sh "docker push ${imageName}"
-
+                                
                                 sh "kubectl apply -f k8s/deployment.yaml"
                                 sh "kubectl apply -f k8s/hpa.yaml"
                             }

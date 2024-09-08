@@ -11,7 +11,12 @@ metadata:
   labels:
     app: bff
 spec:
-  replicas: 3
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: bff
